@@ -1,10 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Very simple chars indicator.
 # Author: Tobias Schlitt <toby@php.net>
 #
 # Hacked by Cyrille37 on 2016-02-03
+#
+# Ported to Python 3 by Adrian I Lam <adrianiainlam@gmail.com>
 #
 # Copyright (c) 2011, Tobias Schlitt
 # All rights reserved.
@@ -34,15 +36,12 @@
 
 import os
 import re
-import gtk
-import gio
+from gi.repository import Gtk, Gio, AppIndicator3
 import signal
 import subprocess
-# sudo apt-get install python-appindicator
-import appindicator
 
 APP_NAME = 'indicator-chars'
-APP_VERSION = '0.2'
+APP_VERSION = '0.2_python3'
 
 class IndicatorChars:
     CHARS_PATH = os.path.join(os.getenv('HOME'), '.indicator-chars')
@@ -52,24 +51,21 @@ class IndicatorChars:
     description_pattern = re.compile(r' *(\([^)]+\)) *')
 
     def __init__(self):
-        self.ind = appindicator.Indicator(
-            # Custom icon seems to doesn't work on my Ubuntu 12.04 LTS running Unity 2D
-            #"Chars", os.path.join(self.SCRIPT_DIR, 'light16x16.png'),
-            # So fallback to an referenced theme's icon name
-            "Chars", "accessories-character-map",
-            appindicator.CATEGORY_APPLICATION_STATUS)
-        self.ind.set_status(appindicator.STATUS_ACTIVE)        
+        self.ind = AppIndicator3.Indicator.new(
+            "Chars", os.path.join(self.SCRIPT_DIR, 'light16x16.svg'),
+            AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
 
         self.update_menu()
 
     def create_menu_item(self, label):
-        item = gtk.MenuItem()
+        item = Gtk.MenuItem()
         item.set_label(label)
         return item
 
     def on_chars_changed(self, filemonitor, file, other_file, event_type):
-        if event_type == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-            print 'Characters changed, updating menu...'
+        if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
+            print('Characters changed, updating menu...')
             self.update_menu()
     
     def update_menu(self, widget = None, data = None):
@@ -79,10 +75,10 @@ class IndicatorChars:
             charDef = []
 
         # Create menu
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         
         for charLine in charDef:
-            charLine = unicode(charLine)
+            charLine = str(charLine)
             charLine = charLine.strip()
             submenu_match = self.submenu_title_pattern.match(charLine)
             if submenu_match:
@@ -93,7 +89,7 @@ class IndicatorChars:
                 submenu_title = ''.join(
                     self.description_pattern.split(charLine)[::2])
             parentItem = self.create_menu_item(submenu_title)
-            subMenu = gtk.Menu()
+            subMenu = Gtk.Menu()
             while charLine:
                 char = charLine[0]
                 charLine = charLine[1:]
@@ -110,7 +106,7 @@ class IndicatorChars:
             parentItem.set_submenu(subMenu)
             menu.append(parentItem)
 
-        menu.append(gtk.SeparatorMenuItem())
+        menu.append(Gtk.SeparatorMenuItem())
         quit_item = self.create_menu_item('Quit')
         quit_item.connect("activate", self.on_quit)
         menu.append(quit_item)
@@ -120,26 +116,26 @@ class IndicatorChars:
         menu.show_all()
 
     def on_char_click(self, widget, char):
-        cb = gtk.Clipboard(selection="PRIMARY")
+        cb = Gtk.Clipboard(selection="PRIMARY")
         cb.set_text(char)
-        cb = gtk.Clipboard(selection="CLIPBOARD")
+        cb = Gtk.Clipboard(selection="CLIPBOARD")
         cb.set_text(char)
 
     def on_quit(self, widget):
-        gtk.main_quit()
+        Gtk.main_quit()
 
 
 if __name__ == "__main__":
     # Catch CTRL-C
-    signal.signal(signal.SIGINT, lambda signal, frame: gtk.main_quit())
+    signal.signal(signal.SIGINT, lambda signal, frame: Gtk.main_quit())
 
     # Run the indicator
     i = IndicatorChars()
     
     # Monitor bookmarks changes 
-    file = gio.File(i.CHARS_PATH)
-    monitor = file.monitor_file()
+    file = Gio.File.new_for_path(i.CHARS_PATH)
+    monitor = file.monitor_file(Gio.FileMonitorFlags.NONE, None)
     monitor.connect("changed", i.on_chars_changed)            
     
     # Main gtk loop
-    gtk.main()
+    Gtk.main()

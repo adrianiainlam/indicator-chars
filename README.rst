@@ -10,9 +10,7 @@ simple copying them to clipboard (similar to original characters applet).
 Create a file .indicator-chars in your home directory with lines of
 characters to be selectable.
 
--------
-Fork Cyrille37
--------
+**Fork by Cyrille37**
 
 :Author: Cyrille37 <cyrille37@gmail.com>
 
@@ -27,6 +25,16 @@ Fork Cyrille37
   - use env to find the Python engine
 
   - add a configuration file example: "conf-example.indicator-chars"
+
+**Fork by Adrian I Lam**
+
+:Author: Adrian I Lam <adrianiainlam@gmail.com>
+
+- Changes to Cyrille37's fork:
+
+  - port to Python 3 from Python 2
+
+  - use the svg custom icon
 
 -------
 Install

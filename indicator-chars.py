@@ -36,7 +36,7 @@
 
 import os
 import re
-from gi.repository import Gtk, Gio, AppIndicator3
+from gi.repository import Gdk, Gtk, Gio, AppIndicator3
 import signal
 import subprocess
 
@@ -116,10 +116,10 @@ class IndicatorChars:
         menu.show_all()
 
     def on_char_click(self, widget, char):
-        cb = Gtk.Clipboard(selection="PRIMARY")
-        cb.set_text(char)
-        cb = Gtk.Clipboard(selection="CLIPBOARD")
-        cb.set_text(char)
+        cb = Gtk.Clipboard.get(Gdk.Atom.intern("PRIMARY", False))
+        cb.set_text(char, -1)
+        cb = Gtk.Clipboard.get(Gdk.Atom.intern("CLIPBOARD", False))
+        cb.set_text(char, -1)
 
     def on_quit(self, widget):
         Gtk.main_quit()

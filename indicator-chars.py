@@ -38,7 +38,6 @@ import os
 import re
 from gi.repository import Gdk, Gtk, Gio, AppIndicator3
 import signal
-import subprocess
 
 APP_NAME = 'indicator-chars'
 APP_VERSION = '0.2_python3'

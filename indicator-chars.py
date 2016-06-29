@@ -36,6 +36,10 @@
 
 import os
 import re
+import gi
+gi.require_version('Gdk', '3.0')
+gi.require_version('Gtk', '3.0')
+gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gdk, Gtk, Gio, AppIndicator3
 import signal
 
